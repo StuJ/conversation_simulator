@@ -1,7 +1,7 @@
 import openai
 
 
-class Persona(object):
+class Agent(object):
 
     def __init__(self, name, description, prompt_template) -> None:
         self.name = name

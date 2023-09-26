@@ -1,5 +1,5 @@
 
-persona_data = [
+agent_data = [
     {
         "name": "OpenAI",
         "description": "The safety team at OpenAI's plan is to build a MVP aligned AGI that can help us solve the full alignment problem. They want to do this with Reinforcement Learning from Human Feedback (RLHF): get feedback from humans about what is good, i.e. give reward to AI's based on the human feedback. Problem: what if the AI makes gigabrain 5D chess moves that humans don't understand, so can't evaluate. Jan Leike, the director of the safety team, views this (the informed oversight problem) as the core difficulty of alignment. Their proposed solution: an AI assisted oversight scheme, with a recursive hierarchy of AIs bottoming out at humans. They are working on experimenting with this approach by trying to get current day AIs to do useful supporting work such as summarizing books and criticizing itself."
