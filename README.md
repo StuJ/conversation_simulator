@@ -27,7 +27,7 @@ When given the same prompt, and introducing DeepMind, GPT 4 produced a [much mor
 ---
 Aiming to simulate the annual progress of AI research, with each agent giving a statement on their progress so far, including specific model capabilities, safety incidents and AGI timeline estimates.
 
-[A simulation involving OpenAI, DeepMind and Anthropic](converse/conversations/ai-predictions/agi-6-monthly) predicted that AGI would arrive in 2031, and be developed at the same time by all three labs. This is what the simulation predicts for each lab:
+[A simulation involving OpenAI, DeepMind and Anthropic](converse/conversations/ai-predictions/agi-6-monthly) predicted that AGI would arrive in 2031, and be developed at the same time by all three labs:
 
 **OpenAI**
 - 2025: GPT-6 is able to produce publishable scientific papers

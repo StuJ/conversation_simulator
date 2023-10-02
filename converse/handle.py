@@ -7,13 +7,29 @@ import openai
 import prompts
 from converse.agent import Agent
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def run_conversation(
+        initial_prompt: str,
+        prompt_template: str,
+        run_name: str,
+        conversation_length: int,
+        model: str
+    ) -> list[str]:
+    """Run a conversation between agents.
 
-
-def run_conversation(initial_prompt, prompt_template, run_name, conversation_length, model):
-    # V2 - take an arbitrary number of agents and have each consume the whole conversation
-    # since they last spoke, then take turns speaking.
+    Args:
+        initial_prompt (str): The initial prompt to start the conversation.
+        prompt_template (str): The template to use for the prompt.
+        run_name (str): The name of the run.
+        conversation_length (int): The length of the conversation.
+        model (str): The model to use.
+    
+    Returns:
+        list[str]: The conversation.
+    """
+    # V3 - optionally have agents debate among themselves
+    # to decide next step. V3.5 could just be a completion, then
+    # could do a cool hierarchical agent thing. 
 
     # Instantiate agents.
     agents = [
@@ -21,7 +37,7 @@ def run_conversation(initial_prompt, prompt_template, run_name, conversation_len
             name=entry['name'],
             description=entry['description'],
             prompt_template=prompt_template
-        ) 
+        )
         for entry in prompts.agent_data
     ]
 
@@ -61,6 +77,7 @@ def run_conversation(initial_prompt, prompt_template, run_name, conversation_len
         f.write(prompt_template + '\n\n'.join(conversation))
 
     print(f'Written output to {output_fname}.')
+    return conversation
 
 
 def run():
