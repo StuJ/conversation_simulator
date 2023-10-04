@@ -1,5 +1,3 @@
-import os
-import pathlib
 import itertools
 
 import agent
@@ -8,8 +6,6 @@ import agent
 def run_conversation(
         agents: list[agent.Agent],
         initial_prompt: str,
-        prompt_template: str,
-        run_name: str,
         conversation_length: int,
         model: str,
     ) -> list[str]:
@@ -17,8 +13,6 @@ def run_conversation(
 
     Args:
         initial_prompt (str): The initial prompt to start the conversation.
-        prompt_template (str): The template to use for the prompt.
-        run_name (str): The name of the run.
         conversation_length (int): The length of the conversation.
         model (str): The model to use.
         deliberate (bool, optional): Whether to deliberate. Defaults to False.
@@ -35,6 +29,7 @@ def run_conversation(
 
     # For each agent, feed the comments since they last spoke 
     # as user input to their response.
+    print('---------------------------')
     for agent in itertools.cycle(agents):
 
         if len(next_input_responses[agent.name]) > 0:
@@ -53,14 +48,6 @@ def run_conversation(
         conversation.append(response)
         if len(conversation) >= conversation_length:
             break
+    print('---------------------------')
 
-    output_fname = os.path.join(
-        pathlib.Path(__file__).parent.resolve(),
-        f'conversations/{run_name}.txt'
-    )
-
-    with open(output_fname, 'w+') as f:
-        f.write(prompt_template + '\n\n'.join(conversation))
-
-    print(f'Written output to {output_fname}.')
     return conversation

@@ -30,18 +30,30 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # which is the conversation between the sub agents.
 
 
-def instantiate_agents(agent_list, prompt_template):
-    return [Agent(agent, prompt_template) for agent in agent_list]
+def instantiate_agents(data, parent=None):
+    agents = data['agents']
+    return [Agent(agent, data['prompt_template'], parent) for agent in agents]
 
 
 class Agent(object):
     """An agent in a conversation."""
 
-    def __init__(self, data, prompt_template) -> None:
+    def __init__(self, data: dict, prompt_template: str, parent=None) -> None:
         self.name = data['name']
-        system_prompt = prompt_template.format(name=self.name, desc=data['description'])
+        self.desc = data['description']
+
+        if parent:
+            system_prompt = prompt_template.format(
+                name=self.name,
+                desc=self.desc,
+                parent=parent.name,
+                parent_desc=parent.desc
+            )
+        else:
+            system_prompt = prompt_template.format(name=self.name, desc=self.desc)
+
         self.messages = [{'role': 'system', 'content': system_prompt}]
-        self.subagents = instantiate_agents(data['agents'], prompt_template)
+        self.subagents = instantiate_agents(data['agents'], parent=self)
     
     def deliberate(self, model: str = 'gpt-4'):
         """Deliberate between subagents, generating a response.
@@ -53,10 +65,10 @@ class Agent(object):
             str: The agent's response.
         """
 
-        # If agent has subagents, run a conversation between them.
-        if self.subagents:
-            self.deliberate(self.subagents, self.messages, model)
+        # Run the conversation between subagents.
+        deliberation = converse.run_conversation(self.subagents)
 
+        # Summarise the conversation to generate a response.
         response = openai.Completion.create(
             model=model,
             prompt=self.messages,
@@ -81,9 +93,10 @@ class Agent(object):
 
         self.messages.append({'role': 'user', 'content': input})
 
-        # If agent has subagents, run a conversation between them.
+        # If agent has subagents, run a conversation between them
+        # to decide on the higher agent's response.
         if self.subagents:
-            self.deliberate(self.subagents, self.messages, model)
+            return self.deliberate(self.subagents, model)
 
         response = openai.ChatCompletion.create(
             model=model,
@@ -94,4 +107,3 @@ class Agent(object):
         self.messages.append(newest)
 
         return newest['content']
-    
