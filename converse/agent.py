@@ -30,30 +30,20 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # which is the conversation between the sub agents.
 
 
-def instantiate_agents(data, parent=None):
-    agents = data['agents']
-    return [Agent(agent, data['prompt_template'], parent) for agent in agents]
-
-
 class Agent(object):
     """An agent in a conversation."""
 
-    def __init__(self, data: dict, prompt_template: str, parent=None) -> None:
+    def __init__(self, data: dict, prompt_template: str) -> None:
         self.name = data['name']
         self.desc = data['description']
-
-        if parent:
-            system_prompt = prompt_template.format(
-                name=self.name,
-                desc=self.desc,
-                parent=parent.name,
-                parent_desc=parent.desc
-            )
-        else:
-            system_prompt = prompt_template.format(name=self.name, desc=self.desc)
-
+        system_prompt = prompt_template.format(name=self.name, desc=self.desc)
         self.messages = [{'role': 'system', 'content': system_prompt}]
-        self.subagents = instantiate_agents(data['agents'], parent=self)
+        self.subagents = self.instantiate_agents(data['subagents'])
+    
+    @staticmethod
+    def instantiate_agents(data: dict):
+        agents = data['agents']
+        return [Agent(agent, data['prompt_template']) for agent in agents]
     
     def deliberate(self, model: str = 'gpt-4'):
         """Deliberate between subagents, generating a response.
@@ -69,9 +59,10 @@ class Agent(object):
         deliberation = converse.run_conversation(self.subagents)
 
         # Summarise the conversation to generate a response.
+        prompt = self.messages + '\n'.join(deliberation)
         response = openai.Completion.create(
             model=model,
-            prompt=self.messages,
+            prompt=prompt,
             temperature=1.0
         )
         newest = response.choices[0].text

@@ -14,12 +14,10 @@ def handle():
     """Handle the conversation between agents."""
 
     run_name='7-government-annual'
-    prompt_template = prompts.prompt_templates['prediction']
 
     conversation = converse.run_conversation(
-        agents=agent.instantiate_agents(prompts.agent_data, prompt_template), 
-        initial_prompt='Begin the conversation', 
-        prompt_template=prompt_template, 
+        agents=agent.Agent.instantiate_agents(prompts.agent_data), 
+        initial_prompt='Begin the conversation',
         conversation_length=20,
         model='gpt-4', 
         deliberate=True

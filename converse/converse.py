@@ -1,10 +1,8 @@
 import itertools
 
-import agent
-
 
 def run_conversation(
-        agents: list[agent.Agent],
+        agents: list,
         initial_prompt: str,
         conversation_length: int,
         model: str,
@@ -12,10 +10,10 @@ def run_conversation(
     """Run a conversation between agents.
 
     Args:
+        agents (list): The agents to converse.
         initial_prompt (str): The initial prompt to start the conversation.
         conversation_length (int): The length of the conversation.
         model (str): The model to use.
-        deliberate (bool, optional): Whether to deliberate. Defaults to False.
     
     Returns:
         list[str]: The conversation.
