@@ -42,8 +42,9 @@ prompt_templates = {
         """A conversation takes place between people working at your organisation
         in order to decide on the work of a given year. Please summarise
         the conversation in order to produce the statement.
-        You will take as input both the high level conversation between labs and
-        the conversation between people working at your organisation.
+        You will take as input both the high level conversation between labs
+        (this part will begin with 'Statements: ') and the conversation between 
+        people working at your organisation (this part will begin with '<Org name> deliberation:').
         """,
         """You are a high-level decision maker at an important organisation for the 
         development of AI, either an AI lab or the UK government, debating with your 
@@ -58,7 +59,10 @@ prompt_templates = {
         organisation: {parent_desc}.
         """,
         """Your name is {name} and here is some information about you, to inform your contribution 
-        to the debate. {desc}
+        to the debate. {desc}. Your responses must be a maximum of 3 sentences long,
+        and just reflect your own position. The user will then reply with the responses
+        of the other employees for you to respond to. Each statement must begin with your
+        organisation's name and your name followed by a colon, e.g. 'OpenAI CEO: <response>'.
         """
     ]
 } 
@@ -67,7 +71,7 @@ openai_desc = "The safety team at OpenAI's plan is to build a MVP aligned AGI th
 deepmind_desc = "DeepMind's plan is to build a MVP aligned AGI that can help us solve the full alignment problem. They want to do this with Reinforcement Learning from Human Feedback (RLHF): get feedback from humans about what is good, i.e. give reward to AI's based on the human feedback. Problem: what if the AI makes gigabrain 5D chess moves that humans don't understand, so can't evaluate. Jan Leike, the director of the safety team, views this (the informed oversight problem) as the core difficulty of alignment. Their proposed solution: an AI assisted oversight scheme, with a recursive hierarchy of AIs bottoming out at humans. They are working on experimenting with this approach by trying to get current day AIs to do useful supporting work such as summarizing books and criticizing itself."
 anthropic_desc = "Anthropic develops large-scale AI systems so that they can study their safety properties at the technological frontier, where new problems are most likely to arise. They use these insights to create safer, steerable, and more reliable models, and to generate systems that we deploy externally, like Claude. Claude is a language model designed to be more helpful, honest and harmless. Helpful, Honest, and Harmless (HHH) are three components of building AI systems (like Claude) that are aligned with people’s interests. Claude wants to help the user. Claude shares information it believes to be true, and avoids made-up information. Claude will not cooperate in aiding the user in harmful activities. While no existing model is close to perfection on HHH, we are pushing the research frontier in this area and expect to continue to improve."
 gov_desc = "The UK government releases statements describing their regulation in response to AI, while it aims to ensure that the UK remains competitive in the global AI market, while mitigating risks from existential threats presented by AI. For example, misuse of AI by rogue actors to produce bioweapons. It aims to ensure the UK gets the national and international governance of AI technologies right to encourage innovation, investment, and protect the public and our fundamental values."
-initial_prompt = "Begin the conversation"
+initial_prompt = "Make your statement"
 
 agent_data = {
     "agent_level": "Press releases",
@@ -78,7 +82,7 @@ agent_data = {
             "description": openai_desc,
             "subagents": {
                 "agent_level": "Deliberation",
-                "conversation_len": 10,
+                "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": prompt_templates['prediction_deliberate'][1].format(parent='OpenAI', parent_desc=openai_desc) + '\n' + prompt_templates['prediction_deliberate'][2],
                 "agents": [
@@ -102,7 +106,7 @@ agent_data = {
             "description": anthropic_desc,
             "subagents": {
                 "agent_level": "Deliberation",
-                "conversation_len": 10,
+                "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": prompt_templates['prediction_deliberate'][1].format(parent='Anthropic', parent_desc=anthropic_desc) + '\n' + prompt_templates['prediction_deliberate'][2],
                 "agents": [
@@ -122,7 +126,7 @@ agent_data = {
             "description": deepmind_desc,
             "subagents": {
                 "agent_level": "Deliberation",
-                "conversation_len": 10,
+                "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": prompt_templates['prediction_deliberate'][1].format(parent='DeepMind', parent_desc=deepmind_desc) + '\n' + prompt_templates['prediction_deliberate'][2],
                 "agents": [
@@ -146,7 +150,7 @@ agent_data = {
             "description": gov_desc,
             "subagents": {
                 "agent_level": "Deliberation",
-                "conversation_len": 10,
+                "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": prompt_templates['prediction_deliberate'][1].format(parent='UK Government', parent_desc=gov_desc) + '\n' + prompt_templates['prediction_deliberate'][2],
                 "agents": [

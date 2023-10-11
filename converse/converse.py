@@ -44,7 +44,10 @@ def run_conversation(
                 next_input_responses[name].append(response)
 
         conversation.append(response)
-        if len(conversation) >= conversation_length:
+        
+        # Length must be one more than the conversation length
+        # because of the initial prompt.
+        if len(conversation) > conversation_length:
             break
     print('---------------------------')
 

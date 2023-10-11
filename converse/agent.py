@@ -38,8 +38,9 @@ class Agent(object):
         self.desc = agent_data['description']
         system_prompt = context['prompt_template'].format(name=self.name, desc=self.desc)
         self.messages = [{'role': 'system', 'content': system_prompt}]
+        self.conversation = ''
         self.subagents = None
-        
+
         if subagents := (agent_data.get('subagents')):
             self.deliberate_len = subagents['conversation_len']
             self.deliberate_prompt = subagents['initial_prompt']
@@ -48,6 +49,17 @@ class Agent(object):
     @staticmethod
     def instantiate_agents(data: dict):
         return [Agent(agent, data) for agent in data['agents']]
+    
+    def chat_completion(self, messages: str, model: str = 'gpt-4') -> str:
+        """Get chat completon response from OpenAI, given input messages.
+
+        Args:
+            messages (str): The input messages.
+            model (str, optional): The model to use. Defaults to 'gpt-4'.
+        
+            Returns:
+                str: The text response.
+        """
     
     def deliberate(self, agents: list, model: str = 'gpt-4'):
         """Deliberate between agents, generating a response.
@@ -63,6 +75,7 @@ class Agent(object):
         """
 
         # Run the conversation between subagents.
+        print(f'{self.name} deliberation:\n')
         deliberation = converse.run_conversation(
             agents=agents,
             initial_prompt=self.deliberate_prompt,
@@ -71,8 +84,8 @@ class Agent(object):
         )
 
         # Summarise the conversation to generate a response.
-        prompt = self.messages + '\n'.join(deliberation)
-        response = openai.Completion.create(
+        prompt = self.conversation + '\n'.join(deliberation)
+        response = openai.ChatCompletion.create(
             model=model,
             prompt=prompt,
             temperature=1.0
@@ -94,19 +107,40 @@ class Agent(object):
             str: The agent's response.
         """
 
-        self.messages.append({'role': 'user', 'content': input})
+        input_messages = self.messages
 
-        # If agent has subagents, run a conversation between them
-        # to decide on the higher agent's response.
+        # If agent has subagents, run a conversation
+        # between them for the agent to generate its 
+        # response from.
         if self.subagents:
-            return self.deliberate(self.subagents, model)
+            print(f'{self.name} deliberation:\n')
+            deliberation = converse.run_conversation(
+                agents=self.subagents,
+                initial_prompt=self.deliberate_prompt,
+                conversation_length=self.deliberate_len,
+                model=model
+            )
+            deliberation_prompt = (
+                f'Statements: {self.conversation}\n' +
+                f'{self.name} deliberation:\n' + 
+                '\n'.join(deliberation)
+            )
+            # Input the deliberation to the agent to summarise, 
+            # but don't save the deliberation to the agent's messages.
+            input_messages = self.messages + [{'role': 'user', 'content': deliberation_prompt}]
+
+        # TODO: fix - this is appending the input to the agent's messages
+        # when we only want to do that when there are no subagents.
+        self.messages.append({'role': 'user', 'content': input})
+        self.conversation += input + '\n'
 
         response = openai.ChatCompletion.create(
             model=model,
-            messages=self.messages,
+            messages=input_messages,
             temperature=1.0
         )
         newest = response.choices[0].message
         self.messages.append(newest)
+        self.conversation += newest.content + '\n'
 
         return newest['content']
