@@ -33,22 +33,29 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 class Agent(object):
     """An agent in a conversation."""
 
-    def __init__(self, data: dict, prompt_template: str) -> None:
-        self.name = data['name']
-        self.desc = data['description']
-        system_prompt = prompt_template.format(name=self.name, desc=self.desc)
+    def __init__(self, agent_data: dict, context: str) -> None:
+        self.name = agent_data['name']
+        self.desc = agent_data['description']
+        system_prompt = context['prompt_template'].format(name=self.name, desc=self.desc)
         self.messages = [{'role': 'system', 'content': system_prompt}]
-        self.subagents = self.instantiate_agents(data['subagents'])
+        self.subagents = None
+        
+        if subagents := (agent_data.get('subagents')):
+            self.deliberate_len = subagents['conversation_len']
+            self.deliberate_prompt = subagents['initial_prompt']
+            self.subagents = self.instantiate_agents(subagents)
     
     @staticmethod
     def instantiate_agents(data: dict):
-        agents = data['agents']
-        return [Agent(agent, data['prompt_template']) for agent in agents]
+        return [Agent(agent, data) for agent in data['agents']]
     
-    def deliberate(self, model: str = 'gpt-4'):
-        """Deliberate between subagents, generating a response.
+    def deliberate(self, agents: list, model: str = 'gpt-4'):
+        """Deliberate between agents, generating a response.
+        Runs a conversation between agents, then summarises the
+        conversation to generate a response.
 
         Args:
+            agents (list): The agents to deliberate between.
             model (str, optional): The model to use. Defaults to 'gpt-4'.
         
         Returns:
@@ -56,7 +63,12 @@ class Agent(object):
         """
 
         # Run the conversation between subagents.
-        deliberation = converse.run_conversation(self.subagents)
+        deliberation = converse.run_conversation(
+            agents=agents,
+            initial_prompt=self.deliberate_prompt,
+            conversation_length=self.deliberate_len,
+            model=model
+        )
 
         # Summarise the conversation to generate a response.
         prompt = self.messages + '\n'.join(deliberation)
