@@ -19,7 +19,7 @@ def handle():
         agents=agent.Agent.instantiate_agents(prompts.agent_data), 
         initial_prompt='Begin the conversation',
         conversation_length=20,
-        model='gpt-3.5-turbo'
+        model='gpt-4'
     )
 
     output_fname = os.path.join(
