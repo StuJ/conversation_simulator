@@ -2,4 +2,4 @@
 .vscode/
 .env
 
-converse/__pycache__/
+__pycache__/
