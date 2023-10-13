@@ -1,7 +1,5 @@
-# Run the conversation between agents, coordinating
-# hierarchical discussions where the high level agent
-# summarises the conversation between sub agents, and
-# the sub agents generate their own statement.
+# Run the conversation between agents
+# and write the output to a file.
 import os
 import pathlib
 
@@ -19,7 +17,8 @@ def handle():
         agents=agent.Agent.instantiate_agents(prompts.agent_data), 
         initial_prompt='Begin the conversation',
         conversation_length=20,
-        model='gpt-4'
+        model='gpt-4',
+        deliberate=True
     )
 
     output_fname = os.path.join(

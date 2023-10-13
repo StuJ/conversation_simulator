@@ -6,6 +6,7 @@ def run_conversation(
         initial_prompt: str,
         conversation_length: int,
         model: str,
+        deliberate: bool = True
     ) -> list[str]:
     """Run a conversation between agents.
 
@@ -14,6 +15,7 @@ def run_conversation(
         initial_prompt (str): The initial prompt to start the conversation.
         conversation_length (int): The length of the conversation.
         model (str): The model to use.
+        deliberate (bool, optional): Whether to deliberate. Defaults to True.
     
     Returns:
         list[str]: The conversation.
@@ -36,7 +38,7 @@ def run_conversation(
         else:
             input_responses = initial_prompt
 
-        response = agent.get_response(input_responses, model)
+        response = agent.get_response(input_responses, model, deliberate)
         print(f'{response}\n')
 
         for name in next_input_responses.keys():
@@ -44,7 +46,7 @@ def run_conversation(
                 next_input_responses[name].append(response)
 
         conversation.append(response)
-        
+
         # Length must be one more than the conversation length
         # because of the initial prompt.
         if len(conversation) > conversation_length:

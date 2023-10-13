@@ -27,7 +27,7 @@ class Agent(object):
     def instantiate_agents(data: dict):
         return [Agent(agent, data) for agent in data['agents']]
    
-    def get_response(self, input: str, model: str = 'gpt-4') -> str:
+    def get_response(self, input: str, model: str = 'gpt-4', deliberate: bool = True) -> str:
         """Get agent's response via OpenAI, given input.
         Appends the response to the agent's messages then returns it.
         If the agent has subagents, runs a conversation between them
@@ -37,6 +37,7 @@ class Agent(object):
         Args:
             input (str): The input to the agent.
             model (str, optional): The model to use. Defaults to 'gpt-4'.
+            deliberate (bool, optional): Whether to deliberate. Defaults to True.
         
         Returns:
             str: The agent's response.
@@ -47,7 +48,7 @@ class Agent(object):
         # If agent has subagents, run a conversation
         # between them for the agent to generate its 
         # response from.
-        if self.subagents:
+        if deliberate and self.subagents:
             print(f'{self.name} deliberation:\n')
             deliberation = converse.run_conversation(
                 agents=self.subagents,
