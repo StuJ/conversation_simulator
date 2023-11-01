@@ -12,13 +12,15 @@ def handle():
     """Handle the conversation between agents."""
 
     run_name='8-deliberate'
+    mode = 'prediction_deliberate'
+    agent_data = prompts.get_agent_data(mode)
 
     conversation = converse.run_conversation(
-        agents=agent.Agent.instantiate_agents(prompts.agent_data), 
+        agents=agent.Agent.instantiate_agents(agent_data), 
         initial_prompt='Begin the conversation',
         conversation_length=20,
         model='gpt-4',
-        deliberate=True
+        subagent_conv=False
     )
 
     output_fname = os.path.join(

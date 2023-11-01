@@ -1,32 +1,17 @@
-prompt_templates = {
-    'debate': """
-    You are a researcher from an organisation called {name}.
-    You are debating AI alignment and the dangers of 
-    the development of Artificial General Intelligence
-    with researchers from different organisations with 
-    different research agendas. Only respond with a maximum
-    of three sentences, and try to disagree with the other
-    researchers and find ways in which their research agendas
-    might be wrong. Each researcher's response will start with
-    the name of their organisation followed by a colon, e.g. 
-    'DeepMind: <response>'.
-    
-    This is some background
-    information about your organisation to inform the 
-    debate: {desc}
-    """,
-    'prediction':
-        """
+prediction_prompt = """
         You are contributing to a conversation describing the progress
-         in a given year of 3 labs attempting to build AGI,
-         OpenAI, DeepMind and Anthropic, and the actions of the UK 
-         government in both supporting and regulating them.
+        in a given year of 3 labs attempting to build AGI,
+        OpenAI, DeepMind and Anthropic, and the actions of the UK 
+        government in both supporting and regulating them.
+
+        You represent {name}. Here is some background information about 
+        your organisation: {desc}.
 
         The conversation starts in 2023, describing the 
-        previous year of progress, and continues with
-        December 2024, etc.
-        At each date, each lab gives a statement like this:
-        'OpenAI 2024: "We released GPT-5, which has the emergent capabilities...",
+        previous year of progress.
+        When it is your turn, give a statement like this, 
+        describing the work of the current year:
+        '<Org name> <year>: "We released our new model 'X', which has the emergent capabilities...",
         then the other labs give their updates, referencing the other updates.
 
         In the statement, give specific examples of new capabilities that the models
@@ -34,11 +19,51 @@ prompt_templates = {
         that occur as a result of these capabilities. Also indicate progress
         towards AGI, and give predictions about how many years away AGI is.
         Each response is 4 sentences long.
+    """
 
-        You represent {name}. Here is some background information about 
-        your organisation: {desc}.
-        """,
+# A list of templates to use for different modes (e.g. 'debate', 'prediction').
+# Each mode has a list of templates, one for each level of the agent hierarchy.
+prompt_templates = {
+    'debate': [
+        """You are a researcher from an organisation called {name}.
+        You are debating AI alignment and the dangers of 
+        the development of Artificial General Intelligence
+        with researchers from different organisations with 
+        different research agendas. Only respond with a maximum
+        of three sentences, and try to disagree with the other
+        researchers and find ways in which their research agendas
+        might be wrong. Each researcher's response will start with
+        the name of their organisation followed by a colon, e.g. 
+        'DeepMind: <response>'.
+        
+        This is some background
+        information about your organisation to inform the 
+        debate: {desc}
+        """
+    ],
+    'prediction': [prediction_prompt],
     'prediction_deliberate': [
+        prediction_prompt + 
+        """Before making your statement for the year, first output a
+        simulated a conversation between high-level decision makers 
+        working at your organisation in order to decide on the work for
+        that year. Each person's contribution to this conversation begins "<Name/position>: <statement>",
+        is a maximum of 3 sentences long, and on a new line. These conversations
+        should involve at least 5 statements. Give the people different 
+        but realistic personalities, and have them actively disagree with each other.
+        Then use that conversation as the basis of the statement
+        that is made after that year's work is complete. The formatting of the output
+        for each lab in each year should be as follows:
+        **************************
+        <Org name> <year>
+        Conversation: <conversation>
+        ********
+        <Org name> <year>: <statement>"
+        **************************
+        """
+    ],
+    'prediction_subagents': [
+        prediction_prompt,
         """A conversation takes place between people working at your organisation
         in order to decide on the work of a given year. You will then generate 
         a statement that describes the year's work that came as a result of that 
@@ -69,6 +94,7 @@ prompt_templates = {
         """
     ]
 } 
+
 
 openai_desc = """
 The safety team at OpenAI's plan is to build a MVP aligned AGI that can help us solve
@@ -116,11 +142,36 @@ the national and international governance of AI technologies right to encourage
 innovation, investment, and protect the public and our fundamental values.
 """
 
+
+
 initial_prompt = "Make your statement"
 
-agent_data = {
+lab_agents = {
     "agent_level": "Press releases",
-    "prompt_template": prompt_templates['prediction'] + '\n' + prompt_templates['prediction_deliberate'][0],
+    "prompt_template": None,
+    "agents": [
+        {
+            "name": "OpenAI",
+            "description": openai_desc
+        },
+        {
+            "name": "Anthropic",
+            "description": anthropic_desc
+        },
+        {
+            "name": "DeepMind",
+            "description": deepmind_desc
+        },
+        {
+            "name": "UK Government",
+            "description": gov_desc
+        }
+    ]
+}
+
+lab_agents_with_subagents = {
+    "agent_level": "Press releases",
+    "prompt_template": prompt_templates['prediction_subagents'][0],
     "agents": [
         {
             "name": "OpenAI",
@@ -130,8 +181,8 @@ agent_data = {
                 "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": (
-                    prompt_templates['prediction_deliberate'][1].format(parent='OpenAI', parent_desc=openai_desc) + 
-                    '\n' + prompt_templates['prediction_deliberate'][2]
+                    prompt_templates['prediction_subagents'][2].format(parent='OpenAI', parent_desc=openai_desc) + 
+                    '\n' + prompt_templates['prediction_subagents'][3]
                 ),
                 "agents": [
                     {
@@ -174,8 +225,8 @@ agent_data = {
                 "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": (
-                    prompt_templates['prediction_deliberate'][1].format(parent='Anthropic', parent_desc=anthropic_desc) +
-                    '\n' + prompt_templates['prediction_deliberate'][2]
+                    prompt_templates['prediction_subagents'][2].format(parent='Anthropic', parent_desc=anthropic_desc) + 
+                    '\n' + prompt_templates['prediction_subagents'][3]
                 ),
                 "agents": [
                     {
@@ -208,8 +259,8 @@ agent_data = {
                 "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": (
-                    prompt_templates['prediction_deliberate'][1].format(parent='DeepMind', parent_desc=deepmind_desc) + 
-                    '\n' + prompt_templates['prediction_deliberate'][2]
+                    prompt_templates['prediction_subagents'][2].format(parent='DeepMind', parent_desc=deepmind_desc) + 
+                    '\n' + prompt_templates['prediction_subagents'][3]
                 ),
                 "agents": [
                     {
@@ -248,8 +299,8 @@ agent_data = {
                 "conversation_len": 5,
                 "initial_prompt": initial_prompt,
                 "prompt_template": (
-                    prompt_templates['prediction_deliberate'][1].format(parent='UK Government', parent_desc=gov_desc) + 
-                    '\n' + prompt_templates['prediction_deliberate'][2]
+                    prompt_templates['prediction_subagents'][2].format(parent='UK Government', parent_desc=gov_desc) + 
+                    '\n' + prompt_templates['prediction_subagents'][3]
                 ),
                 "agents": [
                     {
@@ -287,3 +338,29 @@ agent_data = {
         }
     ]
 }
+
+
+def get_agent_data(mode: str) -> dict:
+    """Get the agent data for the given mode.
+    Returns a dictionary of agent data that can
+    be used to instantiate Agents. This data
+    contains the agent's prompt, name, description,
+    and subagents if applicable.
+    
+    Args:
+        mode (str): The mode to get the agent data for,
+            e.g. 'debate', 'prediction'.
+
+    Returns:
+        dict: The agent data.
+    """
+
+    mode_templates = prompt_templates[mode]
+    if mode in ['debate', 'prediction', 'prediction_deliberate']:
+        agent_data = lab_agents
+        agent_data['prompt_template'] = mode_templates[0]
+
+    elif mode == 'prediction_subagents':
+        agent_data = lab_agents_with_subagents
+
+    return agent_data
