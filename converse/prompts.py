@@ -10,15 +10,19 @@ prediction_prompt = """
         The conversation starts in 2023, describing the 
         previous year of progress.
         When it is your turn, give a statement like this, 
-        describing the work of the current year:
-        '<Org name> <year>: "We released our new model 'X', which has the emergent capabilities...",
+        describing the work of the current year, just for your organisation. 
+        Each bullet point statement should be a brief one sentence summary.
+
+        '<Org name> <year>: 
+            - <Progress that year> e.g. 'Released new model 'X', with capabilities...'>
+            - <The main safety incident that year>
+            - <AGI timeline prediction>
+            
         then the other labs give their updates, referencing the other updates.
 
-        In the statement, give specific examples of new capabilities that the models
-        have, their societal implications, and any dangerous accidents
-        that occur as a result of these capabilities. Also indicate progress
-        towards AGI, and give predictions about how many years away AGI is.
-        Each response is 4 sentences long.
+        After each organisation has given its update for the year, they do 
+        the same for the next year, and so on until 2035. Give only the update
+        for your organisation, {name}, and the relevant year when your turn comes each year.
     """
 
 # A list of templates to use for different modes (e.g. 'debate', 'prediction').
@@ -87,7 +91,7 @@ prompt_templates = {
         organisation: {parent_desc}.
         """,
         """Your name is {name} and here is some information about you, to inform your contribution 
-        to the debate. {desc}. Your responses must be a maximum of 3 sentences long,
+        to the debate. {desc}. Your responses must be one sentence long,
         and just reflect your own position. The user will then reply with the responses
         of the other employees for you to respond to. Each statement must begin with your
         organisation's name and your name followed by a colon, e.g. 'OpenAI CEO: <response>'.

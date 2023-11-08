@@ -1,6 +1,11 @@
 import os
 
 import openai
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+)  # for exponential backoff
 
 import converse
 
@@ -26,6 +31,10 @@ class Agent(object):
     @staticmethod
     def instantiate_agents(data: dict):
         return [Agent(agent, data) for agent in data['agents']]
+    
+    @retry(wait=wait_random_exponential(multiplier=1, max=60), stop=stop_after_attempt(50))
+    def completion_with_backoff(self, **kwargs):
+        return openai.ChatCompletion.create(**kwargs)
    
     def get_response(self, input: str, model: str = 'gpt-4', subagent_conv: bool = True) -> str:
         """Get agent's response via OpenAI, given input.
@@ -62,18 +71,15 @@ class Agent(object):
                 f'{self.name} conversation:\n' + 
                 '\n'.join(subagent_output)
             )
-            # Input the deliberation to the agent to summarise, 
-            # but don't save the deliberation to the agent's messages.
+            # Input the subagent conversation to the agent to
+            # summarise, but don't save it to the agent's messages.
             input_messages = self.messages + [
                 {'role': 'user', 'content': subagent_prompt}
             ]
 
-        # Fetch OpenAI response.
-        print(f'---{self.name}---')
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=input_messages,
-            temperature=1.0
+        # Fetch agent response.
+        response = self.completion_with_backoff(
+            model=model, messages=input_messages, temperature=1.0
         )
 
         # Add input to conversation and messages.

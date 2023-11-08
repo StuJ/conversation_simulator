@@ -1,4 +1,5 @@
 import itertools
+import time
 
 
 def run_conversation(
@@ -52,6 +53,7 @@ def run_conversation(
         # because of the initial prompt.
         if len(conversation) > conversation_length:
             break
+
     print('---------------------------')
 
     return conversation
