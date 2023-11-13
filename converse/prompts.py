@@ -1,3 +1,30 @@
+format_prompt = """
+    You will be given a block of text that contains a set of
+    statements describing the work of several AI organisations
+    in a given year, over several years. Each organisation has 
+    made a statement in the format <Org name> <year>: <statement>.
+    Before each statement there might also be a set of statements under
+    the heading '<Org name> conversation:' which describe the
+    conversation at the organisation in order to decide on the 
+    work described in the statement. 
+
+    Please format this text as Markdown, such that each year
+    has its own section with the year as heading and a bullet
+    point summary of the year's statements from each organisation,
+    with a maximum of 5 bullet points.
+
+    Then for each year, show all of the statements from each
+    organisation under an expandable block with the heading
+    'Statements' in bold. If a conversation block is present for an
+    organisation, put the conversation in an expandable block
+    under that organisation's statement with the heading
+    'Conversation' in bold, inside the 'Statements' block, 
+    with a line break underneath it.
+
+    This is the block of text to reformat: 
+
+"""
+
 prediction_prompt = """
         You are contributing to a conversation describing the progress
         in a given year of 3 labs attempting to build AGI,
@@ -17,7 +44,7 @@ prediction_prompt = """
             - <Progress that year> e.g. 'Released new model 'X', with capabilities...'>
             - <The main safety incident that year>
             - <AGI timeline prediction>
-            
+
         then the other labs give their updates, referencing the other updates.
 
         After each organisation has given its update for the year, they do 

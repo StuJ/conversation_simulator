@@ -1,5 +1,4 @@
 import itertools
-import time
 
 
 def run_conversation(
@@ -24,7 +23,7 @@ def run_conversation(
     """
 
     conversation = [initial_prompt]
-    # Loop through agent, passing output of one to input of other.
+    conv_len = 0
 
     # Save next input responses for each agent.
     next_input_responses = {agent.name: [] for agent in agents}
@@ -40,7 +39,9 @@ def run_conversation(
         else:
             input_responses = initial_prompt
 
-        response = agent.get_response(input_responses, model, subagent_conv)
+        response, subagent_output = agent.get_response(
+            input_responses, model, subagent_conv
+        )
         print(f'{response}\n')
 
         for name in next_input_responses.keys():
@@ -48,10 +49,11 @@ def run_conversation(
                 next_input_responses[name].append(response)
 
         conversation.append(response)
+        conv_len += 1
+        if subagent_output:
+            conversation.append(subagent_output)
 
-        # Length must be one more than the conversation length
-        # because of the initial prompt.
-        if len(conversation) > conversation_length:
+        if conv_len >= conversation_length:
             break
 
     print('---------------------------')
