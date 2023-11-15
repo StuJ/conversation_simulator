@@ -1,7 +1,5 @@
 import itertools
 
-import utils, prompts
-
 
 def run_conversation(
         agents: list,

@@ -1,4 +1,4 @@
-Why are you pursuing your research agenda?
+**Why are you pursuing your research agenda?**
 
 OpenAI: We are pursuing our research agenda because we believe that the development of Artificial General Intelligence (AGI) has the potential to greatly benefit humanity, but also poses significant risks if not properly aligned with human values and goals. Our focus is on ensuring the safe and beneficial development of AGI by addressing challenges such as the informed oversight problem, which could arise when AGI surpasses human understanding and evaluation capabilities.
 

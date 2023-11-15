@@ -11,7 +11,7 @@ def handle():
 
     conversation_length = 30
     run_name = f'13-subagent-no-gov-len-{conversation_length}'
-    mode = 'prediction_subagents'
+    mode = 'prediction-subagents'
     agent_data = prompts.get_agent_data(mode)
 
     # TODO: just see if it did cut off because of token limit.

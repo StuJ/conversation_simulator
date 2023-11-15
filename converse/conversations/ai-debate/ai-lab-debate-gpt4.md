@@ -1,4 +1,4 @@
-Why are you pursuing your research agenda?
+**Why are you pursuing your research agenda?**
 
 OpenAI: We believe that prioritizing safety in the development of Artificial General Intelligence (AGI) is essential to avoid potential negative outcomes. By focusing on Reinforcement Learning from Human Feedback (RLHF), we aim to ensure that AGI's actions align with human values and goals. Our research agenda also includes working on safeguards against the potential difficulties inherent to this approach, like the informed oversight problem.
 
