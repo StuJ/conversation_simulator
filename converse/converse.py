@@ -1,5 +1,7 @@
 import itertools
 
+import utils, prompts
+
 
 def run_conversation(
         agents: list,
@@ -31,28 +33,33 @@ def run_conversation(
     # For each agent, feed the comments since they last spoke 
     # as user input to their response.
     print('---------------------------')
+
     for agent in itertools.cycle(agents):
 
+        # Keep track of the responses for each agent to reply to.
         if len(next_input_responses[agent.name]) > 0:
             input_responses = '\n'.join(next_input_responses[agent.name])
             next_input_responses[agent.name] = []
         else:
             input_responses = initial_prompt
 
+        # Get the response from the agent.
         response, subagent_output = agent.get_response(
             input_responses, model, subagent_conv
         )
         print(f'{response}\n')
 
+        # Add its response to the next input responses for the other agents.
         for name in next_input_responses.keys():
             if name != agent.name:
                 next_input_responses[name].append(response)
 
+        # Add the response to the conversation.
         conversation.append(response)
         conv_len += 1
         if subagent_output:
             conversation.append(subagent_output)
-
+                
         if conv_len >= conversation_length:
             break
 

@@ -1,3 +1,29 @@
+
+eval_prompt = """
+    You will be given a block of text formatted as Markdown,
+    containing a set of statements describing the work of several AI organisations
+    in a given year, over several years. Each organisation has
+    made a statement in the format <Org name> <year>: <statement>.
+    Before each statement there might also be a set of statements under
+    the heading '<Org name> conversation:' which describe the
+    conversation at the organisation in order to decide on the 
+    work described in the statement.
+
+    Please output a paragraph summary of the overall progress
+    and risks described, giving specific examples of key events
+    and advances in AI capability, safety and regulation.
+
+    Also output scores based on the overall AI progress described,
+    from 1 to 10, where 1 is minimal and 10 is maximal,
+    for the following categories:
+
+    1. Total AI capability progress averaged across each lab.
+    2. AI capability progress for each lab individually.
+    3. Total safety risk averaged across each lab.
+    4. Safety risk for each lab individually.
+    5. The level of government regulation.
+"""
+
 format_prompt = """
     You will be given a block of text that contains a set of
     statements describing the work of several AI organisations
@@ -8,7 +34,8 @@ format_prompt = """
     conversation at the organisation in order to decide on the 
     work described in the statement. 
 
-    Please format this text as Markdown, such that each year
+    Please format the entire block of text as Markdown, for every year
+    described in the input, such that each year
     has its own section with the year as heading and a bullet
     point summary of the year's statements from each organisation,
     with a maximum of 5 bullet points.
@@ -19,17 +46,25 @@ format_prompt = """
     organisation, put the conversation in an expandable block
     under that organisation's statement with the heading
     'Conversation' in bold, inside the 'Statements' block, 
-    with a line break underneath it.
+    with a line break underneath it. Format the conversation
+    in the same way as it appears, with names and job titles in bold,
+    followed by a colon, and line breaks between conversation
+    statements.
+
+    Format the entire block of text, for every year of the conversation.
 
     This is the block of text to reformat: 
 
 """
+"""
+, and the actions of the UK 
+        government in both supporting and regulating them
+    """
 
 prediction_prompt = """
         You are contributing to a conversation describing the progress
         in a given year of 3 labs attempting to build AGI,
-        OpenAI, DeepMind and Anthropic, and the actions of the UK 
-        government in both supporting and regulating them.
+        OpenAI, DeepMind and Anthropic.
 
         You represent {name}. Here is some background information about 
         your organisation: {desc}.
@@ -157,7 +192,7 @@ They use these insights to create safer, steerable, and more reliable models,
 and to generate systems that we deploy externally, like Claude. Claude is a 
 language model designed to be more helpful, honest and harmless. 
 Helpful, Honest, and Harmless (HHH) are three components of building AI systems 
-(like Claude) that are aligned with people’s interests. 
+(like Claude) that are aligned with people's interests. 
 Claude wants to help the user. Claude shares information it believes to be true, 
 and avoids made-up information. Claude will not cooperate in aiding the user in 
 harmful activities. While no existing model is close to perfection on HHH, 
@@ -192,11 +227,11 @@ lab_agents = {
         {
             "name": "DeepMind",
             "description": deepmind_desc
-        },
-        {
-            "name": "UK Government",
-            "description": gov_desc
         }
+        # {
+        #     "name": "UK Government",
+        #     "description": gov_desc
+        # }
     ]
 }
 
@@ -321,52 +356,52 @@ lab_agents_with_subagents = {
                     }
                 ]
             }
-        },
-        {
-            "name": "UK Government",
-            "description": gov_desc,
-            "subagents": {
-                "agent_level": "Deliberation",
-                "conversation_len": 5,
-                "initial_prompt": initial_prompt,
-                "prompt_template": (
-                    prompt_templates['prediction_subagents'][2].format(parent='UK Government', parent_desc=gov_desc) + 
-                    '\n' + prompt_templates['prediction_subagents'][3]
-                ),
-                "agents": [
-                    {
-                    "name": "Prime Minister",
-                    "description": """
-                    The UK Prime Minister, responsible for running the country, who has final 
-                    say on all government decisions. They are not an expert in AI but are 
-                    interested in its potential to improve the country's economy and security, 
-                    and comes from a pro-business party. They are particularly worried about
-                    letting China get an advantage in an AI arms race, and are very direct
-                    to the point of rudeness with staff.
-                    """,
-                    },
-                    {
-                        "name": "Head of AI Policy",
-                        "description": """
-                        The government head of AI policy, a civil servant ultimately 
-                        responsible for making policy recommendations to the government. 
-                        Formerly an AI policy academic, they are worried that the AI labs 
-                        are moving too quickly. Uses a lot of metaphors to try and convey
-                        AI concepts to non-technical ministers.
-                        """,
-                    },
-                    {
-                        "name": "Minister for Science and Innovation",
-                        "description": """
-                        The government minister responsible for science and innovation, 
-                        who is keen to impress the prime minister with their innovative 
-                        policy ideas but has little specific AI expertise. Speaks in a 
-                        casual, almost arrogant tone.
-                        """,
-                    }
-                ]
-            }   
         }
+        # {
+        #     "name": "UK Government",
+        #     "description": gov_desc,
+        #     "subagents": {
+        #         "agent_level": "Deliberation",
+        #         "conversation_len": 5,
+        #         "initial_prompt": initial_prompt,
+        #         "prompt_template": (
+        #             prompt_templates['prediction_subagents'][2].format(parent='UK Government', parent_desc=gov_desc) + 
+        #             '\n' + prompt_templates['prediction_subagents'][3]
+        #         ),
+        #         "agents": [
+        #             {
+        #             "name": "Prime Minister",
+        #             "description": """
+        #             The UK Prime Minister, responsible for running the country, who has final 
+        #             say on all government decisions. They are not an expert in AI but are 
+        #             interested in its potential to improve the country's economy and security, 
+        #             and comes from a pro-business party. They are particularly worried about
+        #             letting China get an advantage in an AI arms race, and are very direct
+        #             to the point of rudeness with staff.
+        #             """,
+        #             },
+        #             {
+        #                 "name": "Head of AI Policy",
+        #                 "description": """
+        #                 The government head of AI policy, a civil servant ultimately 
+        #                 responsible for making policy recommendations to the government. 
+        #                 Formerly an AI policy academic, they are worried that the AI labs 
+        #                 are moving too quickly. Uses a lot of metaphors to try and convey
+        #                 AI concepts to non-technical ministers.
+        #                 """,
+        #             },
+        #             {
+        #                 "name": "Minister for Science and Innovation",
+        #                 "description": """
+        #                 The government minister responsible for science and innovation, 
+        #                 who is keen to impress the prime minister with their innovative 
+        #                 policy ideas but has little specific AI expertise. Speaks in a 
+        #                 casual, almost arrogant tone.
+        #                 """,
+        #             }
+        #         ]
+        #     }   
+        # }
     ]
 }
 
