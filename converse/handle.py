@@ -9,27 +9,19 @@ import agent, converse, prompts, utils
 def handle():
     """Handle the conversation between agents."""
 
+    # Running with China but no subagents.
+    # Keep doing this for more variants - I've already demonstrated subagent ability.
     conversation_length = 30
-    run_name = f'13-subagent-no-gov-len-{conversation_length}'
-    mode = 'prediction-subagents'
+    run_name = f'15-china-len-{conversation_length}'
+    mode = 'prediction'
     agent_data = prompts.get_agent_data(mode)
 
-    # TODO: just see if it did cut off because of token limit.
-    # if finish_reason is 'stop', prompt again saying 'please continue'.
-    # Or just not bother formatting longer conversations
-    # or write a script to do it
-    # Could then try and get GPT4 to score each conversation
-    # according to capability and risk, then run a bunch under
-    # different circumstances and see how they score.
-
-    # Or just run as long as possible and then format the output
-    # and run experiments on that time frame.
     conversation = converse.run_conversation(
         agents=agent.Agent.instantiate_agents(agent_data), 
         initial_prompt='Begin the conversation',
         conversation_length=conversation_length,
         model='gpt-4-1106-preview',
-        subagent_conv=True
+        subagent_conv=False
     )
     output = utils.format_output(conversation)
 

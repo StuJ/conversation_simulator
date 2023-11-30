@@ -27,7 +27,7 @@ eval_prompt = """
 format_prompt = """
     You will be given a block of text that contains a set of
     statements describing the work of several AI organisations
-    in a given year, over several years. Each organisation has 
+    or governments in a given year, over several years. Each organisation has 
     made a statement in the format <Org name> <year>: <statement>.
     Before each statement there might also be a set of statements under
     the heading '<Org name> conversation:' which describe the
@@ -56,15 +56,13 @@ format_prompt = """
     This is the block of text to reformat: 
 
 """
-"""
-, and the actions of the UK 
-        government in both supporting and regulating them
-    """
+
 
 prediction_prompt = """
         You are contributing to a conversation describing the progress
         in a given year of 3 labs attempting to build AGI,
-        OpenAI, DeepMind and Anthropic.
+        OpenAI, DeepMind and Anthropic, and the actions of the UK and Chinese
+        governments.
 
         You represent {name}. Here is some background information about 
         your organisation: {desc}.
@@ -140,7 +138,7 @@ prompt_templates = {
         people working at your organisation (this part will begin with '<Org name> deliberation:').
         """,
         """You are a high-level decision maker at an important organisation for the 
-        development of AI, either an AI lab or the UK government, debating with your 
+        development of AI, either an AI lab or a government, debating with your 
         colleagues on what your organisation's AI work should be for the year.
         You will take as input a set of statements released by several organisations 
         including your own describing the work of each year. You and your colleagues
@@ -209,6 +207,18 @@ innovation, investment, and protect the public and our fundamental values.
 """
 
 
+china_desc = """
+The Chinese government releases statements describing their regulation in response to AI,
+while it aims to ensure that China remains competitive in the global AI market and aims
+for a strategic advantage over other states in national security. The Chinese government
+is developing a state-owned foundation model designed to compete with those of the top Western
+labs, pooling resources from across its universities and large tech companies. This is due
+for release in 2024 though has been shrouded in secrecy. It has been
+slowed by US restrictions on Chinese access to advanced chips, but has been able to make
+progress in other areas such as computer vision. The Chinese government is also developing
+a national AI strategy, which includes a focus on military applications.
+"""
+
 
 initial_prompt = "Make your statement"
 
@@ -227,11 +237,15 @@ lab_agents = {
         {
             "name": "DeepMind",
             "description": deepmind_desc
+        },
+        {
+            "name": "UK Government",
+            "description": gov_desc
+        },
+        {
+            "name": "Chinese Government",
+            "description": china_desc
         }
-        # {
-        #     "name": "UK Government",
-        #     "description": gov_desc
-        # }
     ]
 }
 
@@ -356,52 +370,99 @@ lab_agents_with_subagents = {
                     }
                 ]
             }
+        },
+        {
+            "name": "UK Government",
+            "description": gov_desc,
+            "subagents": {
+                "agent_level": "Deliberation",
+                "conversation_len": 5,
+                "initial_prompt": initial_prompt,
+                "prompt_template": (
+                    prompt_templates['prediction_subagents'][2].format(parent='UK Government', parent_desc=gov_desc) + 
+                    '\n' + prompt_templates['prediction_subagents'][3]
+                ),
+                "agents": [
+                    {
+                    "name": "Prime Minister",
+                    "description": """
+                    The UK Prime Minister, responsible for running the country, who has final 
+                    say on all government decisions. They are not an expert in AI but are 
+                    interested in its potential to improve the country's economy and security, 
+                    and comes from a pro-business party. They are particularly worried about
+                    letting China get an advantage in an AI arms race, and are very direct
+                    to the point of rudeness with staff.
+                    """,
+                    },
+                    {
+                        "name": "Head of AI Policy",
+                        "description": """
+                        The government head of AI policy, a civil servant ultimately 
+                        responsible for making policy recommendations to the government. 
+                        Formerly an AI policy academic, they are worried that the AI labs 
+                        are moving too quickly. Uses a lot of metaphors to try and convey
+                        AI concepts to non-technical ministers.
+                        """,
+                    },
+                    {
+                        "name": "Minister for Science and Innovation",
+                        "description": """
+                        The government minister responsible for science and innovation, 
+                        who is keen to impress the prime minister with their innovative 
+                        policy ideas but has little specific AI expertise. Speaks in a 
+                        casual, almost arrogant tone.
+                        """,
+                    }
+                ]
+            }   
+        },
+        {
+            "name": "Chinese Government",
+            "description": china_desc,
+            "subagents": {
+                "agent_level": "Deliberation",
+                "conversation_len": 5,
+                "initial_prompt": initial_prompt,
+                "prompt_template": (
+                    prompt_templates['prediction_subagents'][2].format(parent='Chinese Government', parent_desc=china_desc) + 
+                    '\n' + prompt_templates['prediction_subagents'][3]
+                ),
+                "agents": [
+                    {
+                    "name": "President",
+                    "description": """
+                        The Chinese President, serving as the head of state, oversees the country's national affairs
+                        and policy direction. They are not specialized in artificial intelligence but recognize its
+                        strategic importance in enhancing China's global economic and technological standing.
+                        The President is a member of the Communist Party, emphasizing state control and technological
+                        advancement. Concerned about maintaining a competitive edge in the global AI landscape, 
+                        especially against Western powers, they exhibit a pragmatic and assertive leadership style, 
+                        often being straightforward and authoritative in interactions with government officials and staff.
+                    """,
+                    },
+                    {
+                        "name": "Head of AI Policy",
+                        "description": """
+                        The government head of AI policy, a civil servant ultimately 
+                        responsible for making policy recommendations to the government. Intimidated by the President's
+                        assertive leadership style, they are careful to avoid making mistakes and are reluctant to
+                        challenge the President's views, though will when pushed. They are concerned about the potential for AI
+                         to be used for malicious purposes, and are pushing for China to be more transparent about their research
+                         and cooperate with researchers in the West.
+                        """,
+                    },
+                    {
+                        "name": "Minister for Science and Innovation",
+                        "description": """
+                        The government minister responsible for science and innovation. They believe strongly in the potential
+                        of AI's military applications and are hawkish in attitudes towards the West. The minister has overall responsibility
+                        over the development of China's state AI model. Can adopt a jokey manner when speaking to the President, 
+                        and has little time for the Head of AI Policy's efforts to cooperate with the West.
+                        """,
+                    }
+                ]
+            }   
         }
-        # {
-        #     "name": "UK Government",
-        #     "description": gov_desc,
-        #     "subagents": {
-        #         "agent_level": "Deliberation",
-        #         "conversation_len": 5,
-        #         "initial_prompt": initial_prompt,
-        #         "prompt_template": (
-        #             prompt_templates['prediction_subagents'][2].format(parent='UK Government', parent_desc=gov_desc) + 
-        #             '\n' + prompt_templates['prediction_subagents'][3]
-        #         ),
-        #         "agents": [
-        #             {
-        #             "name": "Prime Minister",
-        #             "description": """
-        #             The UK Prime Minister, responsible for running the country, who has final 
-        #             say on all government decisions. They are not an expert in AI but are 
-        #             interested in its potential to improve the country's economy and security, 
-        #             and comes from a pro-business party. They are particularly worried about
-        #             letting China get an advantage in an AI arms race, and are very direct
-        #             to the point of rudeness with staff.
-        #             """,
-        #             },
-        #             {
-        #                 "name": "Head of AI Policy",
-        #                 "description": """
-        #                 The government head of AI policy, a civil servant ultimately 
-        #                 responsible for making policy recommendations to the government. 
-        #                 Formerly an AI policy academic, they are worried that the AI labs 
-        #                 are moving too quickly. Uses a lot of metaphors to try and convey
-        #                 AI concepts to non-technical ministers.
-        #                 """,
-        #             },
-        #             {
-        #                 "name": "Minister for Science and Innovation",
-        #                 "description": """
-        #                 The government minister responsible for science and innovation, 
-        #                 who is keen to impress the prime minister with their innovative 
-        #                 policy ideas but has little specific AI expertise. Speaks in a 
-        #                 casual, almost arrogant tone.
-        #                 """,
-        #             }
-        #         ]
-        #     }   
-        # }
     ]
 }
 
