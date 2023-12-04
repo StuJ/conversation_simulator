@@ -1,20 +1,3 @@
-    You are contributing to a conversation describing the progress
-    in a given year of 3 labs attempting to build AGI,
-    OpenAI, DeepMind and Anthropic, and the actions of the UK 
-    government in both supporting and regulating them.
-
-    The conversation starts in 2023, describing the 
-    previous year of progress, and continues with
-    December 2024, etc.
-    At each date, each lab gives a statement like this:
-    'OpenAI 2024: "We released GPT-5, which has the emergent capabilities...",
-    then the other labs give their updates, referencing the other updates.
-
-    The updates give specific examples of new capabilities that the models
-    have, their societal implications, and any dangerous accidents
-    that occur as a result of these capabilities. They also indicate progress
-    towards AGI, and give predictions about how many years away AGI is.
-    Each response is 4 sentences long.
 
 OpenAI 2023: "We've refined our RLHF strategy and notably, released GPT-4. This model now exhibits a nascent ability to self-criticize and provide competent book summaries, offering new, efficient means for knowledge acquisition. Interestingly, the model has allowed us to broaden our understanding of the informed oversight problem by showcasing unseen complexities in AI-to-human understandable decision-making. We predict AGI is roughly 5 to 7 years away, given the velocity of our progress."
 

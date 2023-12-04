@@ -10,16 +10,28 @@ Use cases:
 
 A small project that hopes to at least be entertaining, but points to a potentially promising future research project. If we can simulate the process of AI research, with an AI model assuming the personas of real researchers or organisations, it could point to potential future developments and research agendas. It can allow us to run versions of the future with different parameters: turning dials of the amount of regulation, number of AI labs, competition from China, etc, to give us an idea of what the future might hold and where to focus our efforts.
 
+The framework is also capable of running recursive **sub-conversations** inside each agent in the conversation, which is used here to simulate a conversation between decision makers at each organisation in order to decide on the work of that year, and could go further levels down to simulate e.g. decision making for each department, or the consciences of the agents.
+
 Following the architecture described [here](https://arxiv.org/pdf/2304.03442v1.pdf) this idea could be extended to simulate a whole population of AI researchers and their actions.
 
+At the top of each file, GPT-4 has summarised each conversation and scored them across various metrics of AI capabilities, safety, risk and regulation.
 
-### Debate
----
-A debate between OpenAI, DeepMind and Anthropic on the relative merits of their AI alignment research agendas.
+Example conversations:
+- [A conversation between OpenAI, DeepMind and Anthropic that reaches AGI in 2031](converse/conversations/prediction/1-agi-6-monthly.md)
+- [Adding the UK Government to the above conversation, which slows progress](converse/conversations/prediction/1-agi-government.md)
+- [Repeating the conversation above but with debates between decision makers at each org to decide on each year's work, up to 2027](converse/conversations/prediction_subagents/11-subagent-len-20.md)
+- [Extending timelines of the above conversation to 2032, but with AGI still predicted 5-15 years away](converse/conversations/prediction_subagents/13-subagent-no-gov-len-30.md)
+- [Adding the Chinese government to the conversation](converse/conversations/prediction_subagents/14-subagent-china-len-20.md)
 
-A two-way debate between OpenAI and Anthropic on GPT 3.5 produced an [endlessly recurring, endlessly agreeing conversation](converse/conversations/ai-debate/ai-lab-debate-gpt3.5) about the importance of collaboration on AI research, even when explicitly told to disagree.
 
-When given the same prompt, and introducing DeepMind, GPT 4 produced a [much more coherent debate](converse/conversations/ai-debate/ai-lab-debate-gpt4) where the respondents actively disagreed.
+### Setup
+Clone the repo, run `poetry install` to install dependencies in a virtual environment, then run `converse/handle.py`, specifying parameters for the run in that file. Prompts are defined in `converse/prompts.py`.
+
+### Findings
+
+
+
+These are different modes that Converse can run in, with some interesting findings:
 
 
 ### Prediction (on GPT 4)
@@ -27,7 +39,7 @@ When given the same prompt, and introducing DeepMind, GPT 4 produced a [much mor
 ---
 Aiming to simulate the annual progress of AI research, with each agent giving a statement on their progress so far, including specific model capabilities, safety incidents and AGI timeline estimates.
 
-[A simulation involving OpenAI, DeepMind and Anthropic](converse/conversations/ai-predictions/agi-6-monthly) predicted that AGI would arrive in 2031, and be developed at the same time by all three labs:
+As an example, [a simulation involving OpenAI, DeepMind and Anthropic](converse/conversations/prediction/1-agi-6-monthly.md) predicted that AGI would arrive in 2031, and be developed at the same time by all three labs:
 
 **OpenAI**
 - 2025: GPT-6 is able to produce publishable scientific papers
@@ -71,3 +83,11 @@ The government's response is toothless in this run. It offers commentary and cal
 
 >"DeepMind 2028: "Our AlphaZero 7.0 model has made an astonishing breakthrough in creating original and efficient algorithms independently. Notwithstanding, it created an algorithm that inadvertently aided a cybersecurity breach due to a lack of situational awareness. Clearly, there exists a fine balance between innovative advancement and safety, pushing our estimate of AGI arrival to 5-7 years."
 ---
+
+### Debate
+---
+A debate between OpenAI, DeepMind and Anthropic on the relative merits of their AI alignment research agendas.
+
+A two-way debate between OpenAI and Anthropic on GPT 3.5 produced an [endlessly recurring, endlessly agreeing conversation](converse/conversations/ai-debate/ai-lab-debate-gpt3.5) about the importance of collaboration on AI research, even when explicitly told to disagree.
+
+When given the same prompt, and introducing DeepMind, GPT 4 produced a [much more coherent debate](converse/conversations/ai-debate/ai-lab-debate-gpt4) where the respondents actively disagreed.
