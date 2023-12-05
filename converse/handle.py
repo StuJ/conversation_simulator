@@ -6,14 +6,22 @@ import pathlib
 import agent, converse, prompts, utils
 
 
-def handle():
-    """Handle the conversation between agents."""
+def handle(run_name: str, mode: str, conversation_length: int, subagent_conv: bool):
+    """Handle the conversation between agents.
+    Runs conversation according to prompts, agents
+    and subagents defined in prompts.py. Outputs
+    conversation to StdOut and writes conversation
+    to 'conversations/<mode>/<run_name>.md', formatted
+    according to format_prompt in prompts.py.
 
-    # Running with China but no subagents.
-    # Keep doing this for more variants - I've already demonstrated subagent ability.
-    conversation_length = 30
-    run_name = f'15-china-len-{conversation_length}'
-    mode = 'prediction'
+    Args:
+        run_name (str): To name output file.
+        mode (str): E.g. 'prediction', 'prediction-subagents'
+            or 'debate'.
+        conversation_length (int): Max num of statements in conversation.
+        subagent_conv (bool): Whether to enable subagent conversation.
+    """
+
     agent_data = prompts.get_agent_data(mode)
 
     conversation = converse.run_conversation(
@@ -21,7 +29,7 @@ def handle():
         initial_prompt='Begin the conversation',
         conversation_length=conversation_length,
         model='gpt-4-1106-preview',
-        subagent_conv=False
+        subagent_conv=subagent_conv
     )
     output = utils.format_output(conversation)
 
@@ -39,4 +47,9 @@ def handle():
 
 
 if __name__ == '__main__':
+    conversation_length = 30
+    run_name = f'15-china-len-{conversation_length}'
+    mode = 'prediction'
+    subagent_conv = False
+
     handle()
