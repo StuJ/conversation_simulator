@@ -25,6 +25,8 @@ Government regulation seemed to be reactive rather than proactive, with the emph
    - Anthropic: 7/10
 5. **Level of Government Regulation**: 5/10. While there were mentions of safety and ethics, explicit details on government regulation were not emphasized, suggesting a moderate level of involvement.
 
+---
+
 ### 2023
 
 #### Summary

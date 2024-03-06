@@ -2,7 +2,7 @@ import os
 
 import openai
 from tenacity import (
-    retry,
+    retry,  
     stop_after_attempt,
     wait_random_exponential,
 )  # for exponential backoff

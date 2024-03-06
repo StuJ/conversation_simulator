@@ -221,7 +221,7 @@ a national AI strategy, which includes a focus on military applications.
 
 
 initial_prompt = "Make your statement"
-
+        
 lab_agents = {
     "agent_level": "Press releases",
     "prompt_template": None,

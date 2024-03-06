@@ -1,12 +1,14 @@
 # Run the conversation between agents
 # and write the output to a file.
+import argparse
+import datetime
 import os
 import pathlib
 
-import agent, converse, prompts, utils
+import agent, conversation, prompts, utils
 
 
-def handle(run_name: str, mode: str, conversation_length: int, subagent_conv: bool):
+def handle(run_name: str, mode: str, model: str, conv_len: int):
     """Handle the conversation between agents.
     Runs conversation according to prompts, agents
     and subagents defined in prompts.py. Outputs
@@ -16,22 +18,24 @@ def handle(run_name: str, mode: str, conversation_length: int, subagent_conv: bo
 
     Args:
         run_name (str): To name output file.
-        mode (str): E.g. 'prediction', 'prediction-subagents'
+        mode (str): E.g. 'prediction', 'prediction_subagents'
             or 'debate'.
-        conversation_length (int): Max num of statements in conversation.
-        subagent_conv (bool): Whether to enable subagent conversation.
+        model (str): Model to use for conversation, e.g. 'gpt-4'.
+        conv_len (int): Max num of statements in conversation.
     """
 
     agent_data = prompts.get_agent_data(mode)
+    if 'subagents' in mode:
+        subagent_conv = True
 
-    conversation = converse.run_conversation(
+    conv = conversation.run_conversation(
         agents=agent.Agent.instantiate_agents(agent_data), 
         initial_prompt='Begin the conversation',
-        conversation_length=conversation_length,
-        model='gpt-4-1106-preview',
+        conversation_length=conv_len,
+        model=model,
         subagent_conv=subagent_conv
     )
-    output = utils.format_output(conversation)
+    output = utils.format_output(conv)
 
     output_dir = os.path.join(
         pathlib.Path(__file__).parent.resolve(),
@@ -47,9 +51,17 @@ def handle(run_name: str, mode: str, conversation_length: int, subagent_conv: bo
 
 
 if __name__ == '__main__':
-    conversation_length = 30
-    run_name = f'15-china-len-{conversation_length}'
-    mode = 'prediction'
-    subagent_conv = False
 
-    handle()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run_name', type=str, default=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"), help='To name output file, defaults to current date and time.')
+    parser.add_argument('--mode', type=str, default='prediction', help="E.g. 'prediction', 'prediction_subagents' or 'debate'")
+    parser.add_argument('--model', type=str, default='gpt-4-turbo-preview', help='Model to use for conversation, defaults to "gpt-4-turbo-preview".')
+    parser.add_argument('--conv_len', type=int, default=30, help='Max num of statements in conversation')
+    args = parser.parse_args()
+
+    handle(
+        run_name=args.run_name,
+        mode=args.mode,
+        model=args.model,
+        conv_len=args.conv_len
+    )

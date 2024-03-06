@@ -19,7 +19,7 @@ def run_conversation(
             Defaults to True.
     
     Returns:
-        list[str]: The conversation.
+        list[str]: The conversation as a list of individual string responses.
     """
 
     conversation = [initial_prompt]

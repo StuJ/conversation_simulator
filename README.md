@@ -1,16 +1,20 @@
 # Converse
 
-A general-purpose framework for simulating conversations between agents, powered by GPT-4.
+A general-purpose framework for simulating conversations between agents, powered by LLMs.
 
-This approach uses agents mapped to separate objects in code, each with individual system prompts and contributing to a conversation, rather than having a single prompt to predict the whole conversation. This allows for more complex conversations, with each agent able to hold its own context that is not visible to the others. This might include its own deliberative process, simulated through a separate, nested conversation.
+This approach uses agents mapped to separate objects in code, each with individual system prompts and contributing to a conversation, rather than having a single prompt to predict the whole conversation. This allows for more complex conversations, with each agent able to hold its own context that is not visible to the others. This might include its own deliberative process, simulated through a separate, nested conversation. It currently just uses OpenAI models but can easily be extended to other types of model as well.
 
 ### Setup
-Further work will make the framework more intuitive to use, but the repo is currently in a 'hack day' state and setup is quite manual. Clone the repo, run `poetry install` to install dependencies in a virtual environment, then run `converse/handle.py`, specifying parameters for the run in that file. Prompts, agents and subagents are defined in `converse/prompts.py`.
+Clone the repo, add your OpenAI API Key as the `OPENAI_API_KEY` environment variable, run `poetry install` to install dependencies in a virtual environment, then run from the command line, specifying parameters as args e.g. `poetry run converse.handle.py --run_name first-run --mode prediction-subagents --model gpt-4-turbo-preview --conv_len 20`.
+
+Prompts, agents and subagents are defined in `converse/prompts.py`.
 
 
 ## Use case: AI research simulator!
 
-A small project that hopes to at least be entertaining, but points to potentially promising future research. If we can simulate the process of AI development, with an AI model assuming the personas of real researchers or organisations, it could point to future developments and research agendas. It can allow us to run versions of the future with different parameters: turning dials of the amount of regulation, number of AI labs, competition from China, etc, to give us an idea of what the future might hold and where to focus our efforts. It also gives insight into the behaviour of agent-like LLMs and can be a valuable exercise in 'prompt science'.
+A small project that hopes to at least be entertaining, but points to potentially promising future research. It uses the framework to run conversations between AI labs, governments and researchers, to simulate the future progress of AI.
+
+This can help give us clues about future developments and research agendas. We can run versions of the future or the past with different parameters: turning dials of the amount of regulation, number of AI labs, competition from China, etc, to give us an idea of what the future might hold and where to focus our efforts. It also gives insight into the behaviour of agent-like LLMs and can be a valuable exercise in 'prompt science'.
 
 The framework is also capable of running recursive **sub-conversations** inside each agent in the conversation, which is used here to simulate a conversation between decision makers at each organisation in order to decide on the work of that year, and could go further levels down to simulate e.g. decision making for each department, or the consciences of the agents.
 
@@ -35,14 +39,15 @@ sovereign AGI capability by 2030.
 - Using separate [Python objects](converse/agent.py) to store each agent's context enabled longer and more coherent conversations, enabling more specific briefs for each agent and keeping the subagent conversations private from the other agents.
 - Increasing the amount of text to process, e.g. by adding agents or subagents, slowed AI progress through the years. This is perhaps because the context is harder to parse in order to get a clear thread of progress to advance. The clearest advances were in the [simplest conversations](converse/conversations/prediction/1-agi-6-monthly.md). [Adding the UK Government](converse/conversations/prediction/1-agi-government.md) to this conversation resulted in much slower timelines, but there is no sign of the labs slowing progress in response, so this slowdown might have simply been because there was more text for the model to parse, as described.
 - It was hard to create real disagreement or conflict. Even when told to actively disagree or respond competitively to each other, agents largely disagreed agreeably. Sadly I think this is more a reflection of model behaviour than potential future AI development.
-- Giving subagents personalities (defined [here](converse/prompts.py)) led to more disagreement, though the subagents were quite cariacatured. E.g. a prompt of "Has a tendency to dominate conversations and is very confident in their own views, and can be dismissive of safety concerns. He has a very casual way of speaking." made an agent say "Yo team, I say we double down on scaling up RLHF, maybe even push the envelope with more complex simulations so our AI can handle that 5D chess." [This](converse/conversations/prediction_subagents/12-subagent-len-30-raw.md) is a good raw example of subagent conversation.
+- Giving subagents personalities (defined [here](converse/prompts.py)) led to more disagreement, though the subagents were quite cariacatured. E.g. a prompt of `Has a tendency to dominate conversations and is very confident in their own views, and can be dismissive of safety concerns. He has a very casual way of speaking.` made an agent say `Yo team, I say we double down on scaling up RLHF, maybe even push the envelope with more complex simulations so our AI can handle that 5D chess.` [This](converse/conversations/prediction_subagents/12-subagent-len-30-raw.md) is a good raw example of subagent conversation.
 - Context windows limit the length of time that conversations can meaningfully run for without breaking down in some way, e.g. agents [forgetting which year it is](converse/conversations/prediction/15-china-len-30-cont.md).
 
 
 ### Next steps
 
-- Add tests
-- Add frontend
+- Add frontend.
+- Add different models, e.g. Claude or OS models from HuggingFace.
+- Better ability for the models to generate agent and subagent system prompts.
 - Better maintaining state within agents to enable longer conversations, e.g. forgetting older context.
 - Running many more simulations to get a statistically sound basis for forecasts.
 - Experiment with agents, e.g. sub-sub-agent conversations, making the government more/less restrictive, enabling subagents on some agents and not others, etc.
